@@ -1,0 +1,75 @@
+---
+title: "A brief look at Feed the Future"
+author: 
+  - name: Jacob Patterson-Stein
+  - icon: github
+  - href: https://github.com/jacobpstein
+format:
+  closeread-html:
+    embed-resources: true
+---
+
+```{r packages}
+#| echo: false
+#| message: false
+#| warning: false
+
+library(tidyverse)
+library(readxl)
+library(janitor)
+library(gganimate)
+library(usaidplot)
+
+# data from FAOStat https://www.fao.org/docs/worldfoodsituationlibraries/default-document-library/food_price_indices_data_feb.xls?sfvrsn=63809b16_35 
+food_index_df <- read_excel("food_price_indices_data_feb.xls", skip = 2) |> 
+  select(1:2) |> 
+  clean_names() |> 
+  drop_na() |> 
+  mutate(date = as.Date(date))
+  
+
+```
+
+\
+
+::: {.column-screen style="background-image:url(https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.flickr.com%2Fphotos%2Filri%2F12201465213&psig=AOvVaw0qLLWVYR7cfxEgl4wR_7VT&ust=1741202152605000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCPjmz9aR8YsDFQAAAAAdAAAAABAE); background-size: 100vw; height: 250px; background-position: center +0%; background-repeat: no-repeat;"}
+:::
+
+<figcaption>Plan of [Karl-Marx-Hof](https://en.wikipedia.org/wiki/Karl-Marx-Hof), built between 1927 and 1930 by city planner Karl Ehn. Source: [Vielfalt der Moderne](https://vielfaltdermoderne.de/karl-marx-hof/)</figcaption>
+
+\
+
+## What Was Feed the Future?
+
+Global food prices in 2006 began rapidly increasing due to a confluence of drought, high oil prices, and various macroeconomic factors that devastated low- and middle-income countries.
+
+```{r fao}
+#| output: 'asis'
+#| message: false
+#| warning: false
+#| fig-asp: 1.2
+food_index_plot <- 
+  food_index_df |> 
+  filter(year(date)>=2000 & date<="2008-07-01") |> 
+  ggplot(aes(x = date, y = food_price_index)) +
+  geom_line(lwd = 1.2, color = "#002F6C") +
+  # geom_segment(aes(xend = ymd("2008-12-01"), yend = food_price_index), linetype = 2, colour = 'grey') + 
+  geom_point(size = 4) + 
+  transition_reveal(date) +
+  coord_cartesian(clip = 'off') + 
+  labs(x = "", y = 'FAO Monthly Food Price Index (2014-2016=100)', title = "Global Food Prices Rapidly Increased from 2006 to 2008") + 
+  usaid_plot() 
+  
+animate(food_index_plot, nframe = 200, end_pause = 25)
+
+```
+
+::: {.cr-section layout="sidebar-left"}
+Global leaders gathered in response and by 2010 the Obama Administration's comittments coalesed as the Feed the Future Initiative. ["By Kremlin.ru, CC BY 4.0, https://commons.wikimedia.org/w/index.php?curid=7256134](G8_Summit_-_8_July_2009-9.jpg)
+
+Unlike emergency humanitarian food relief, Feed the Future would focus on preventing the next food crisis, with a focus on food production [tea fields, Photo Credit: Jacob Patterson-Stein](rice.jpg)
+
+Nutrition [Baby in Honduras, Photo Credit: USAID-ACCESO/Fintrac Inc.https://www.flickr.com/photos/usaid_images/14720125257](baby.jpg)
+
+And Poverty [Arid region in Kenya, Photo Credit: Jacob Patterson-Stein](poverty.jpeg)
+:::
