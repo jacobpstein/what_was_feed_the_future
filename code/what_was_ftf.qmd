@@ -1,13 +1,47 @@
 ---
-title: "A brief look at Feed the Future"
+title: "What Was Feed the Future?"
 author: 
   - name: Jacob Patterson-Stein
-  - icon: github
-  - href: https://github.com/jacobpstein
+lightbox: true
 format:
   closeread-html:
-    embed-resources: true
+    embed-resource: true
+    code-tools: true
+    cr-section:
+      layout: overlay-left
+      remove-header-space: true
 ---
+
+```{=html}
+<!-- some quick style customisation: see https://closeread.dev/guide/styling -->
+<style>
+  .cr-section.overlay-left {
+    background-color: white;
+  }
+
+  .cr-section.overlay-left .narrative-col .narrative {
+    font-size: 1.15em;
+    font: Gill Sans;
+    background-color: #3a79aa;
+    color: #f1f1f1;
+    padding: 0.6em 0.8em;
+    border-radius: 1;
+    backdrop-filter: blur(10px);
+  }
+  
+  .cr-section.overlay-left .narrative-col .narrative a {
+    background-color: #3a79aa;
+    color: #f1f1f1;
+  }
+  
+  
+  
+  img.full-width {
+  width: 100%;
+  height: auto;
+}
+</style>
+```
 
 ```{r packages}
 #| echo: false
@@ -20,8 +54,9 @@ library(janitor)
 library(gganimate)
 library(usaidplot)
 
-# data from FAOStat https://www.fao.org/docs/worldfoodsituationlibraries/default-document-library/food_price_indices_data_feb.xls?sfvrsn=63809b16_35 
-food_index_df <- read_excel("food_price_indices_data_feb.xls", skip = 2) |> 
+# data from FAOStat https://www.fao.org/docs/worldfoodsituationlibraries/default-document-library/food_price_indices_data_feb.xls?sfvrsn=63809b16_35
+
+food_index_df <- read_excel("../data/food_price_indices_data_feb.xls", skip = 2) |> 
   select(1:2) |> 
   clean_names() |> 
   drop_na() |> 
@@ -30,24 +65,16 @@ food_index_df <- read_excel("food_price_indices_data_feb.xls", skip = 2) |>
 
 ```
 
-\
-
-::: {.column-screen style="background-image:url(https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.flickr.com%2Fphotos%2Filri%2F12201465213&psig=AOvVaw0qLLWVYR7cfxEgl4wR_7VT&ust=1741202152605000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCPjmz9aR8YsDFQAAAAAdAAAAABAE); background-size: 100vw; height: 250px; background-position: center +0%; background-repeat: no-repeat;"}
-:::
-
-<figcaption>Plan of [Karl-Marx-Hof](https://en.wikipedia.org/wiki/Karl-Marx-Hof), built between 1927 and 1930 by city planner Karl Ehn. Source: [Vielfalt der Moderne](https://vielfaltdermoderne.de/karl-marx-hof/)</figcaption>
-
-\
-
-## What Was Feed the Future?
+## 
 
 Global food prices in 2006 began rapidly increasing due to a confluence of drought, high oil prices, and various macroeconomic factors that devastated low- and middle-income countries.
 
 ```{r fao}
-#| output: 'asis'
+#| error: false
 #| message: false
 #| warning: false
-#| fig-asp: 1.2
+#| fig-height: 4
+#| fig-width: 12
 food_index_plot <- 
   food_index_df |> 
   filter(year(date)>=2000 & date<="2008-07-01") |> 
@@ -57,19 +84,46 @@ food_index_plot <-
   geom_point(size = 4) + 
   transition_reveal(date) +
   coord_cartesian(clip = 'off') + 
-  labs(x = "", y = 'FAO Monthly Food Price Index (2014-2016=100)', title = "Global Food Prices Rapidly Increased from 2006 to 2008") + 
-  usaid_plot() 
+  labs(x = "", y = "Monthly Food Price Index", title = "Global Food Prices Rapidly Increased from 2006 to 2008", caption = "Data: FAO Food Price Index\nNote: 2014-2016=100") + 
+  usaid_plot() +
+  theme(text = element_text(size = 14)
+        , axis.text.y = element_text(size = 12)
+        , title = element_text(size = 16))
   
 animate(food_index_plot, nframe = 200, end_pause = 25)
 
 ```
 
-::: {.cr-section layout="sidebar-left"}
-Global leaders gathered in response and by 2010 the Obama Administration's comittments coalesed as the Feed the Future Initiative. ["By Kremlin.ru, CC BY 4.0, https://commons.wikimedia.org/w/index.php?curid=7256134](G8_Summit_-_8_July_2009-9.jpg)
 
-Unlike emergency humanitarian food relief, Feed the Future would focus on preventing the next food crisis, with a focus on food production [tea fields, Photo Credit: Jacob Patterson-Stein](rice.jpg)
 
-Nutrition [Baby in Honduras, Photo Credit: USAID-ACCESO/Fintrac Inc.https://www.flickr.com/photos/usaid_images/14720125257](baby.jpg)
+::::{.cr-section}
 
-And Poverty [Arid region in Kenya, Photo Credit: Jacob Patterson-Stein](poverty.jpeg)
+:::{#cr-myplot}
+!["By Kremlin.ru, CC BY 4.0, https://commons.wikimedia.org/w/index.php?curid=7256134](../pics/G8_Summit_-_8_July_2009-9.jpg)
 :::
+
+Global leaders gathered in response and by 2010 the Obama Administration's comittments coalesed as the Feed the Future Initiative.[@cr-myplot]{pan-to="10%,-10%" scale-by="2.0"}
+
+:::{#cr-tea}
+![tea fields, Photo Credit: Jacob Patterson-Stein](../pics/rice.jpg)
+:::
+
+Unlike emergency humanitarian food relief, Feed the Future would focus on preventing the next food crisis, with a focus on food production [@cr-tea]
+
+
+::: {#cr-baby}
+![Baby in Honduras, Photo Credit: USAID-ACCESO/Fintrac Inc.https://www.flickr.com/photos/usaid_images/14720125257](../pics/baby.jpg)
+:::
+
+Nutrition[@cr-baby]
+
+
+::: {#cr-desert}
+![Arid region in Kenya, Photo Credit: Jacob Patterson-Stein](../pics/poverty.jpeg)
+:::
+
+And Poverty[@cr-desert]
+
+::::
+
+
