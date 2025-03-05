@@ -5,15 +5,13 @@ author:
 lightbox: true
 format:
   closeread-html:
-    embed-resource: true
-    code-tools: true
+    embed-resources: true
     cr-section:
       layout: overlay-left
       remove-header-space: true
 ---
 
 ```{=html}
-# this comes from https://github.com/anaelDelorme/closeRead_saint_jacut/blob/master/index_en.qmd
 <style>
   .cr-section.overlay-left {
     background-color: white;
@@ -101,25 +99,36 @@ animate(food_index_plot, nframe = 225, end_pause = 25)
 
 ```
 
-::::{.cr-section, layout="sidebar-right"}
+::::{.cr-section}
 
 ::: {#cr-myplot}
 !["By Kremlin.ru, CC BY 4.0, https://commons.wikimedia.org/w/index.php?curid=7256134](../pics/G8_Summit_-_8_July_2009-9.jpg)
 :::
 
-Global leaders gathered in response and by 2010 the Obama Administration's comittments coalesed as the Feed the Future Initiative. [@cr-myplot]
+Global leaders gathered in response and by 2010 the Obama Administration's comittments coalesed as the Feed the Future Initiative.[@cr-myplot]{scale-by="7"}
 
 ::: {#cr-tea}
 ![Tea fields, Photo Credit: Jacob Patterson-Stein](../pics/rice.jpg)
 :::
 
+
 Unlike emergency humanitarian food relief, Feed the Future would focus on preventing the next food crisis, with a focus on food production [@cr-tea]
 
-::: {#cr-baby}
-![Baby in Honduras, Photo Credit: USAID-ACCESO/Fintrac Inc.https://www.flickr.com/photos/usaid_images/14720125257](../pics/baby.jpg)
+
+::::
+
+::::{.cr-section}
+
+:::{#cr-baby}
+![](../pics/baby.jpeg)
 :::
 
+
 Nutrition[@cr-baby]
+
+::::
+
+::::{.cr-section}
 
 ::: {#cr-desert}
 ![Arid region in Kenya, Photo Credit: Jacob Patterson-Stein](../pics/poverty.jpeg)
@@ -129,16 +138,13 @@ And Poverty[@cr-desert]
 
 ::::
 
-::::{.cr-section, layout="overlay-center"}
-
+::::{.cr-section layout="overlay-center"}
 
 :::{#cr-ftf-targets}
-
-```{r}
+```{r ftf-targets}
 #| warning: false
 #| message: false
-#| fig-width: 12
-#| fig-height: 8
+#| echo: false
 
 # Define the list of countries to highlight
 ftf_countries <- c("Bangladesh", "Cambodia", "Ethiopia", "Ghana", "Guatemala", 
@@ -163,10 +169,14 @@ world <- world |>
 region_colors <- c("Asia" = "#C25700", "Africa" = "#237C9A", "Central America" = "#518325", "Other" = "#E6E7E8")
 
 # Get centroids for labeling
-centroids <- world |> 
-  filter(region != "Other") |> 
-  st_centroid() |> 
-  mutate(long = st_coordinates(.)[,1], lat = st_coordinates(.)[,2])
+centroids <- world %>% 
+  filter(region != "Other") %>% 
+  st_transform(crs = st_crs(world)) %>%  # Ensure same CRS
+  st_centroid() %>% 
+  st_coordinates() %>% 
+  as.data.frame() %>%
+  bind_cols(world %>% filter(region != "Other") %>% select(admin)) %>%
+  rename(long = X, lat = Y)
 
 # map it all
 ggplot(data = world) +
@@ -180,15 +190,13 @@ ggplot(data = world) +
         axis.text = element_blank(),
         axis.ticks = element_blank(),
         panel.grid = element_blank()) +
-  coord_sf(xlim = c(-100, 120), ylim = c(-40, 45)) + 
+  coord_sf(xlim = c(-100, 120), ylim = c(-40, 42)) + 
   labs(x = "", y = "")
 
 
 ```
-
 :::
 
 19 "Target countries" were originally chosen.[@cr-ftf-targets]
 
 ::::
-
