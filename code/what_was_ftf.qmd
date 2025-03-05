@@ -13,7 +13,7 @@ format:
 ---
 
 ```{=html}
-<!-- some quick style customisation: see https://closeread.dev/guide/styling -->
+# this comes from https://github.com/anaelDelorme/closeRead_saint_jacut/blob/master/index_en.qmd
 <style>
   .cr-section.overlay-left {
     background-color: white;
@@ -53,6 +53,11 @@ library(readxl)
 library(janitor)
 library(gganimate)
 library(usaidplot)
+library(extrafont)
+library(rnaturalearth)
+library(rnaturalearthdata)
+library(sf)
+library(ggrepel)  
 
 # data from FAOStat https://www.fao.org/docs/worldfoodsituationlibraries/default-document-library/food_price_indices_data_feb.xls?sfvrsn=63809b16_35
 
@@ -88,35 +93,33 @@ food_index_plot <-
   usaid_plot() +
   theme(text = element_text(size = 14)
         , axis.text.y = element_text(size = 12)
-        , title = element_text(size = 16))
+        , title = element_text(size = 16)
+        , plot.caption = element_text(size = 8)
+        )
   
-animate(food_index_plot, nframe = 200, end_pause = 25)
+animate(food_index_plot, nframe = 225, end_pause = 25)
 
 ```
 
+::::{.cr-section, layout="sidebar-right"}
 
-
-::::{.cr-section}
-
-:::{#cr-myplot}
+::: {#cr-myplot}
 !["By Kremlin.ru, CC BY 4.0, https://commons.wikimedia.org/w/index.php?curid=7256134](../pics/G8_Summit_-_8_July_2009-9.jpg)
 :::
 
-Global leaders gathered in response and by 2010 the Obama Administration's comittments coalesed as the Feed the Future Initiative.[@cr-myplot]{pan-to="10%,-10%" scale-by="2.0"}
+Global leaders gathered in response and by 2010 the Obama Administration's comittments coalesed as the Feed the Future Initiative. [@cr-myplot]
 
-:::{#cr-tea}
-![tea fields, Photo Credit: Jacob Patterson-Stein](../pics/rice.jpg)
+::: {#cr-tea}
+![Tea fields, Photo Credit: Jacob Patterson-Stein](../pics/rice.jpg)
 :::
 
 Unlike emergency humanitarian food relief, Feed the Future would focus on preventing the next food crisis, with a focus on food production [@cr-tea]
-
 
 ::: {#cr-baby}
 ![Baby in Honduras, Photo Credit: USAID-ACCESO/Fintrac Inc.https://www.flickr.com/photos/usaid_images/14720125257](../pics/baby.jpg)
 :::
 
 Nutrition[@cr-baby]
-
 
 ::: {#cr-desert}
 ![Arid region in Kenya, Photo Credit: Jacob Patterson-Stein](../pics/poverty.jpeg)
@@ -126,4 +129,66 @@ And Poverty[@cr-desert]
 
 ::::
 
+::::{.cr-section, layout="overlay-center"}
+
+
+:::{#cr-ftf-targets}
+
+```{r}
+#| warning: false
+#| message: false
+#| fig-width: 12
+#| fig-height: 8
+
+# Define the list of countries to highlight
+ftf_countries <- c("Bangladesh", "Cambodia", "Ethiopia", "Ghana", "Guatemala", 
+                   "Haiti", "Honduras", "Kenya", "Liberia", "Malawi", "Mozambique", 
+                   "Nepal", "Rwanda", "Senegal", "Tajikistan", "Tanzania", 
+                   "Uganda", "Zambia")
+
+# Load world map data
+world <- ne_countries(scale = "medium", returnclass = "sf")
+
+# Create a new column for highlighting
+world <- world |>
+  mutate(region = case_when(
+    admin %in% c("Bangladesh", "Cambodia", "Nepal", "Tajikistan") ~ "Asia",
+    admin %in% c("Ethiopia", "Ghana", "Kenya", "Liberia", "Malawi", "Mozambique", 
+                 "Rwanda", "Senegal", "Tanzania", "Uganda", "Zambia") ~ "Africa",
+    admin %in% c("Guatemala", "Haiti", "Honduras") ~ "Central America",
+    TRUE ~ "Other"
+  ))
+
+# Define colors for regions
+region_colors <- c("Asia" = "#C25700", "Africa" = "#237C9A", "Central America" = "#518325", "Other" = "#E6E7E8")
+
+# Get centroids for labeling
+centroids <- world |> 
+  filter(region != "Other") |> 
+  st_centroid() |> 
+  mutate(long = st_coordinates(.)[,1], lat = st_coordinates(.)[,2])
+
+# map it all
+ggplot(data = world) +
+  geom_sf(aes(fill = region), color = "white", size = 0.2) +
+    usaid_plot() +
+  scale_fill_manual(values = region_colors) +
+  geom_text_repel(data = centroids, aes(x = long, y = lat, label = admin), 
+                  size = 4, box.padding = 0.3, segment.color = "black", family = "Gill Sans") +
+  
+  theme(legend.position = "none",
+        axis.text = element_blank(),
+        axis.ticks = element_blank(),
+        panel.grid = element_blank()) +
+  coord_sf(xlim = c(-100, 120), ylim = c(-40, 45)) + 
+  labs(x = "", y = "")
+
+
+```
+
+:::
+
+19 "Target countries" were originally chosen.[@cr-ftf-targets]
+
+::::
 
