@@ -70,13 +70,13 @@ food_index_df <- read_excel("../data/food_price_indices_data_feb.xls", skip = 2)
 
 ## 
 
-Global food prices in 2006 began rapidly increasing due to a confluence of drought, high oil prices, and various macroeconomic factors that devastated low- and middle-income countries.
+<font size="8">Global food prices in 2006 began rapidly increasing due to a confluence of drought, high oil prices, and various macroeconomic factors that devastated low- and middle-income countries.</font>
 
 ```{r fao}
 #| error: false
 #| message: false
 #| warning: false
-#| fig-height: 4
+#| fig-height: 6
 #| fig-width: 12
 food_index_plot <- 
   food_index_df |> 
@@ -99,52 +99,45 @@ animate(food_index_plot, nframe = 225, end_pause = 25)
 
 ```
 
-::::{.cr-section}
-
+::::: cr-section
 ::: {#cr-myplot}
 !["By Kremlin.ru, CC BY 4.0, https://commons.wikimedia.org/w/index.php?curid=7256134](../pics/G8_Summit_-_8_July_2009-9.jpg)
 :::
 
-Global leaders gathered in response and by 2010 the Obama Administration's comittments coalesed as the Feed the Future Initiative.[@cr-myplot]{scale-by="7"}
+Global leaders gathered in response and by 2010 the Obama Administration's comittments coalesed as the Feed the Future Initiative.[@cr-myplot]{scale-by="2"}
 
 ::: {#cr-tea}
 ![Tea fields, Photo Credit: Jacob Patterson-Stein](../pics/rice.jpg)
 :::
 
+Unlike emergency humanitarian food relief, Feed the Future would focus on preventing the next food crisis, with a focus on food production [@cr-tea]{pan-to="0%, 10%"}
+:::::
 
-Unlike emergency humanitarian food relief, Feed the Future would focus on preventing the next food crisis, with a focus on food production [@cr-tea]
-
-
-::::
-
-::::{.cr-section}
-
-:::{#cr-baby}
+:::: cr-section
+::: {#cr-baby}
 ![](../pics/baby.jpeg)
 :::
 
-
 Nutrition[@cr-baby]
-
 ::::
 
-::::{.cr-section}
-
+:::: cr-section
 ::: {#cr-desert}
-![Arid region in Kenya, Photo Credit: Jacob Patterson-Stein](../pics/poverty.jpeg)
+![Arid region in Kenya, Photo Credit: Jacob Patterson-Stein](../pics/pov.jpeg)
 :::
 
 And Poverty[@cr-desert]
-
 ::::
 
-::::{.cr-section layout="overlay-center"}
-
-:::{#cr-ftf-targets}
+:::: {.cr-section layout="overlay-center"}
+::: {#cr-ftf-targets}
 ```{r ftf-targets}
 #| warning: false
 #| message: false
 #| echo: false
+#| fig-height: 6
+#| fig-width: 12
+
 
 # Define the list of countries to highlight
 ftf_countries <- c("Bangladesh", "Cambodia", "Ethiopia", "Ghana", "Guatemala", 
@@ -197,6 +190,23 @@ ggplot(data = world) +
 ```
 :::
 
-19 "Target countries" were originally chosen.[@cr-ftf-targets]
-
+19 "Target countries" were originally chosen. Each country was [selected](https://cg-281711fb-71ea-422c-b02c-ef79f539e9d2.s3.us-gov-west-1.amazonaws.com/uploads/2021/10/Global-Food-Security-Strategy-FY22-26_508C.pdf) based on a data-driven analysis of “level of need” and “opportunity for impact” [@cr-ftf-targets]
 ::::
+
+
+
+<font size="6">Within each country, Zones-of-Influence were created. The idea behind the ZoI was to crowd-in activities where need and opporunity were highest. Since poverty and hunger are complex and multifaceted, the thinking went, any approach to address them should be too.</font> 
+
+
+:::: cr-section
+::: {#cr-ZOIS}
+![Examples of Zones-of-Influence](../pics/combined map.png)
+:::
+
+For example, in Bangladesh, the ZOI was most of the southwest corner of the country, while in Malawi the ZOI covered regions prone to droughts in the north and flooding in the south. [@cr-ZOIS]
+::::
+
+
+
+
+
