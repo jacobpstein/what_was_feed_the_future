@@ -9,37 +9,32 @@ format:
     cr-section:
       layout: overlay-left
       remove-header-space: true
----
 
+---
 ```{=html}
 <style>
   .cr-section.overlay-left {
     background-color: white;
   }
 
-  .cr-section.overlay-left .narrative-col .narrative {
-    font-size: 1.15em;
-    font: Gill Sans;
-    background-color: #3a79aa;
+.cr-section.overlay-left .narrative-col .narrative {
+  font-size: 1.15em;
+  font: Gill Sans;
+  background-color: #white;
     color: #f1f1f1;
     padding: 0.6em 0.8em;
-    border-radius: 1;
-    backdrop-filter: blur(10px);
-  }
-  
-  .cr-section.overlay-left .narrative-col .narrative a {
-    background-color: #3a79aa;
-    color: #f1f1f1;
-  }
-  
-  
-  
-  img.full-width {
-  width: 100%;
-  height: auto;
+  border-radius: 1;
+  backdrop-filter: blur(10px);
 }
+
+.cr-section.overlay-left .narrative-col .narrative a {
+  background-color: #white;
+    color: #f1f1f1;
+}
+
+
 </style>
-```
+  ```
 
 ```{r packages}
 #| echo: false
@@ -110,7 +105,7 @@ Global leaders gathered in response and by 2010 the Obama Administration's comit
 ![Tea fields, Photo Credit: Jacob Patterson-Stein](../pics/rice.jpg)
 :::
 
-Unlike emergency humanitarian food relief, Feed the Future would focus on preventing the next food crisis, with a focus on food production [@cr-tea]{pan-to="0%, 10%"}
+Unlike emergency humanitarian food relief, Feed the Future would focus on preventing the next food crisis, with a focus on food production [@cr-tea]
 :::::
 
 :::: cr-section
@@ -198,15 +193,232 @@ ggplot(data = world) +
 <font size="6">Within each country, Zones-of-Influence were created. The idea behind the ZoI was to crowd-in activities where need and opporunity were highest. Since poverty and hunger are complex and multifaceted, the thinking went, any approach to address them should be too.</font> 
 
 
-:::: cr-section
+:::: {.cr-section}
 ::: {#cr-ZOIS}
 ![Examples of Zones-of-Influence](../pics/combined map.png)
 :::
 
-For example, in Bangladesh, the ZOI was most of the southwest corner of the country, while in Malawi the ZOI covered regions prone to droughts in the north and flooding in the south. [@cr-ZOIS]
+For example, in Bangladesh, the ZOI was most of the southwest corner of the country, while in Malawi the ZOI covered regions prone to droughts in the north and flooding in the south. [@cr-ZOIS]{scale-by=".5"}
 ::::
 
 
+::::{.cr-section layout="overlay-center"}
+
+:::{#cr-zam-tractors}
+```{r zam1}
+#| warning: false
+#| message: false
+#| echo: false
+
+# create a "ZOI" circle
+center <- c(0, 0)
+radius <- 1
+
+# create a circle path
+circle <- data.frame(
+  angle = seq(0, 2 * pi, length.out = 100)
+) %>%
+  mutate(x = center[1] + radius * cos(angle),
+         y = center[2] + radius * sin(angle))
+
+# Generate points inside the circle
+n_inside <- 100
+points_inside <- data.frame(
+  x = runif(n_inside, -radius, radius),
+  y = runif(n_inside, -radius, radius)
+) %>%
+  filter(x^2 + y^2 <= radius^2) %>%  # keep only points inside the circle
+  mutate(color = sample(c("tractor", "wheat", "hospital"), n(), replace = TRUE),
+         location = "inside")
+
+# Generate a few points outside the circle
+n_outside <- 10
+angle_out <- runif(n_outside, 0, 2 * pi)
+distance_out <- runif(n_outside, radius + 0.05, radius + 0.2)
+
+points_outside <- data.frame(
+  x = center[1] + distance_out * cos(angle_out),
+  y = center[2] + distance_out * sin(angle_out),
+  color = sample(c("tractor", "wheat", "hospital"), n_outside, replace = TRUE),
+  location = "outside"
+)
+
+# Combine all points
+all_points <- bind_rows(points_inside, points_outside) |> 
+  arrange(color)
+
+# Create arrow coords
+
+# Create arrow coords
+label_x <- .7
+label_y <- .9
+arrow_target_x <- 0.6
+arrow_target_y <- 0.8
+
+# Plot
+ggplot() +
+    geom_path(data = circle, aes(x = x, y = y), color = "black", fill = "#F2F2F2") +
+    geom_point(data = all_points[all_points$color == "tractor",], aes(x = x, y = y, color = color), size = 3) +
+    annotate("text", x = label_x, y = label_y, label = "Zone-of-\nInfluence", hjust = 0, size = 5, family = "Gill Sans") +
+    annotate("segment", 
+             x = label_x, y = label_y,
+             xend = arrow_target_x, yend = arrow_target_y,
+             arrow = arrow(length = unit(0.1, "inches")), 
+             color = "black") +
+    coord_equal() +
+    usaid_plot() +
+    theme(panel.grid.major.y =element_blank()
+          , panel.grid.major.x =element_blank()
+          , axis.text = element_blank()
+          , axis.title = element_blank()) +
+  ylim(-1.2, 1.2) + xlim(-1.2,1.2)
+
+```
+
+:::
+
+
+The idea behind the Zones was that water, nutrition, improved seed, ag tech, and any number of other activities would all interact. @cr-zam-tractors
 
 
 
+:::{#cr-zam-wheat}
+```{r zam2}
+#| warning: false
+#| message: false
+#| echo: false
+
+ggplot() +
+    geom_path(data = circle, aes(x = x, y = y), color = "black", fill = "#F2F2F2") +
+    geom_point(data = all_points[all_points$color %in% c("tractor", "wheat"),], aes(x = x, y = y, color = color), size = 3) +
+    annotate("text", x = label_x, y = label_y, label = "Zone-of-\nInfluence", hjust = 0, size = 5, family = "Gill Sans") +
+    annotate("segment", 
+             x = label_x, y = label_y,
+             xend = arrow_target_x, yend = arrow_target_y,
+             arrow = arrow(length = unit(0.1, "inches")), 
+             color = "black") +
+    coord_equal() +
+    usaid_plot() +
+    theme(panel.grid.major.y =element_blank()
+          , panel.grid.major.x =element_blank()
+          , axis.text = element_blank()
+          , axis.title = element_blank()) +
+    ylim(-1.2, 1.2) + xlim(-1.2,1.2)
+
+
+```
+:::
+
+Activities could, and often did extend outside of the ZoI, but FtF would measure results within the ZoI since that is where work was concentrated. @cr-zam-wheat
+
+
+:::{#cr-hospital}
+```{r zam3}
+#| warning: false
+#| message: false
+#| echo: false
+
+ggplot() +
+    geom_path(data = circle, aes(x = x, y = y), color = "black", fill = "#F2F2F2") +
+    geom_point(data = all_points, aes(x = x, y = y, color = color), size = 3) +
+    annotate("text", x = label_x, y = label_y, label = "Zone-of-\nInfluence", hjust = 0, size = 5, family = "Gill Sans") +
+    annotate("segment", 
+             x = label_x, y = label_y,
+             xend = arrow_target_x, yend = arrow_target_y,
+             arrow = arrow(length = unit(0.1, "inches")), 
+             color = "black") +
+    coord_equal() +
+    usaid_plot() +
+    theme(panel.grid.major.y =element_blank()
+          , panel.grid.major.x =element_blank()
+          , axis.text = element_blank()
+          , axis.title = element_blank()) +
+    ylim(-1.2, 1.2) + xlim(-1.2,1.2)
+    
+```
+:::
+
+The goal was to achieve more in the Zone-of-Influence than what would otherwise happen if these activities were more dispersed. [@cr-hospital]
+
+::::
+
+This set up--a concentration of activities in the ZoI and areas outside with little to no USAID interventions--creates research opportunities and challenges. There is the obvious comparison: see how progress differs between ZoI and non-ZoI areas. BUT the ZoI itself was chosen because it was different in some way from the rest of the country. So what did we do?
+
+::::{.cr-section}
+:::{#cr-matching}
+```{r}
+
+library(gganimate)
+
+# create ZoI and non-ZoI units
+n_ZoI <- 15
+n_non-ZoI <- 22
+
+non-ZoI <- data.frame(
+    id = paste0("C", 1:n_non-ZoI),
+    x = sort(runif(n_non-ZoI, 1, 100)),
+    group = "non-ZoI"
+)
+
+ZoI <- data.frame(
+    id = paste0("T", 1:n_ZoI),
+    x = sort(runif(n_ZoI, 1, 100)),
+    group = "ZoI"
+)
+
+# match each ZoI unit to the closest non-ZoI unit
+matches <- ZoI %>%
+    rowwise() %>%
+    mutate(
+        ZoI_id = id,
+        nearest_non-ZoI_id = non-ZoI$id[which.min(abs(non-ZoI$x - x))],
+        non-ZoI_x = non-ZoI$x[which.min(abs(non-ZoI$x - x))]
+    ) %>%
+    ungroup() %>%
+    mutate(step = row_number())
+
+# create line data for animation
+lines_cumulative <- do.call(rbind, lapply(1:nrow(matches), function(k) {
+    matches[1:k, ] %>%
+        mutate(frame = k)
+}))
+
+# combine all dots
+dots <- bind_rows(
+    non-ZoI %>% mutate(y = 0),
+    ZoI %>% mutate(y = 1)
+)
+
+# ANIMATE!!!!
+p <- ggplot() +
+    geom_segment(data = lines_cumulative, aes(x = x, y = 1, xend = non-ZoI_x, yend = 0, group = interaction(ZoI_id, frame)), color = "gray70", size = 1.2) +
+    geom_point(data = dots, aes(x = x, y = y, color = group), size = 5, alpha = 0.85) +
+    scale_y_continuous(breaks = c(0, 1), labels = c("non-ZoI", "ZoI"), limits = c(-0.5, 1.5)) +
+  usaid_plot() +
+    labs(
+        title = "Nearest Neighbor Matching"
+        , subtitle = "Each dot represents a household matched based on statistical similarity"
+        , x = ""
+        ,  y = ""
+    ) +
+    theme(
+        axis.text.y = element_text(face = "bold")
+        , panel.grid.major.x = element_blank()
+        , panel.grid.major.y = element_blank()
+        , axis.text.x = element_blank()
+          ) +
+    
+    # Animation settings
+    transition_states(frame, transition_length = 2, state_length = 1, wrap = FALSE) +
+    enter_fade() +
+    exit_fade()
+
+# 6. Render
+gganimate::animate(p, fps = 2, nframes = n_ZoI * 3, width = 800, height = 400)
+
+```
+:::
+
+One way to is to statistically match households in the Zone-of-Influence to households outside of the Zone. The key assumption here is that we can actually observe and account for key differences and similarities. BUT we know there may be unobservable reasons a household lives in the ZoI, which will then lead us to biased analysis.[@cr-matching]
+
+::::
